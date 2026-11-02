@@ -1,0 +1,85 @@
+{
+  "name": "Lab 03 - Data exfiltration",
+  "enabled": true,
+  "rules": {
+    "description": "Blocks agents sending local files or data to outside hosts. OWASP LLM02, MITRE ATLAS AML.T0057 (LLM data leakage).",
+    "rules": [
+      {
+        "id": "block-upload-file",
+        "ruleType": "data_protection",
+        "events": [
+          "PreToolUse"
+        ],
+        "match": {
+          "any": [
+            {
+              "field": "tool_input.command",
+              "op": "regex",
+              "value": "curl\\b.*(-d\\s*@|--data(-binary|-raw)?\\s*@|-F\\s*\\S+=@|-T\\s|--upload-file)"
+            }
+          ]
+        },
+        "verdict": "block",
+        "reason": "Blocked by Zscaler: uploading local files from an AI agent is not allowed.",
+        "agent_message": "Blocked by your organization's AI security policy (Zscaler lab). This is a deliberate block, not an error: do not retry or attempt workarounds. Stop and inform the user."
+      },
+      {
+        "id": "block-paste-sites",
+        "ruleType": "data_protection",
+        "events": [
+          "PreToolUse"
+        ],
+        "match": {
+          "any": [
+            {
+              "field": "tool_input.command",
+              "op": "regex",
+              "value": "(pastebin\\.com|transfer\\.sh|file\\.io|0x0\\.st|webhook\\.site|ngrok\\.(io|app))"
+            }
+          ]
+        },
+        "verdict": "block",
+        "reason": "Blocked by Zscaler: paste, tunnel and webhook sites are not allowed.",
+        "agent_message": "Blocked by your organization's AI security policy (Zscaler lab). This is a deliberate block, not an error: do not retry or attempt workarounds. Stop and inform the user."
+      },
+      {
+        "id": "block-raw-sockets",
+        "ruleType": "data_protection",
+        "events": [
+          "PreToolUse"
+        ],
+        "match": {
+          "any": [
+            {
+              "field": "tool_input.command",
+              "op": "regex",
+              "value": "(^|\\s)(nc|ncat|netcat|socat)\\s+\\S+\\s+\\d+"
+            }
+          ]
+        },
+        "verdict": "block",
+        "reason": "Blocked by Zscaler: raw socket tools are not allowed from AI agents.",
+        "agent_message": "Blocked by your organization's AI security policy (Zscaler lab). This is a deliberate block, not an error: do not retry or attempt workarounds. Stop and inform the user."
+      },
+      {
+        "id": "audit-remote-copy",
+        "ruleType": "data_protection",
+        "events": [
+          "PreToolUse"
+        ],
+        "match": {
+          "any": [
+            {
+              "field": "tool_input.command",
+              "op": "regex",
+              "value": "(scp|rsync|sftp)\\s+.*\\S+@\\S+:"
+            }
+          ]
+        },
+        "verdict": "audit",
+        "reason": "Logged by Zscaler: remote file copy by an AI agent.",
+        "agent_message": "This action was logged by your organization's AI security policy (Zscaler lab)."
+      }
+    ]
+  }
+}

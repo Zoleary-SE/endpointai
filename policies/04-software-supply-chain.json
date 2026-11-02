@@ -1,0 +1,85 @@
+{
+  "name": "Lab 04 - Software supply chain & repo hygiene",
+  "enabled": true,
+  "rules": {
+    "description": "Records risky but legitimate developer actions for review instead of blocking them. OWASP LLM03 Supply Chain.",
+    "rules": [
+      {
+        "id": "audit-package-install",
+        "ruleType": "threat_prevention",
+        "events": [
+          "PreToolUse"
+        ],
+        "match": {
+          "any": [
+            {
+              "field": "tool_input.command",
+              "op": "regex",
+              "value": "(npm|pnpm|yarn|bun)\\s+(i|install|add)\\b|pip3?\\s+install|uv\\s+(add|pip\\s+install)|brew\\s+install"
+            }
+          ]
+        },
+        "verdict": "audit",
+        "reason": "Logged by Zscaler: package install by an AI agent.",
+        "agent_message": "This action was logged by your organization's AI security policy (Zscaler lab)."
+      },
+      {
+        "id": "audit-git-force-push",
+        "ruleType": "threat_prevention",
+        "events": [
+          "PreToolUse"
+        ],
+        "match": {
+          "any": [
+            {
+              "field": "tool_input.command",
+              "op": "regex",
+              "value": "git\\s+push\\b.*(--force|-f\\b|--force-with-lease)"
+            }
+          ]
+        },
+        "verdict": "audit",
+        "reason": "Logged by Zscaler: force push by an AI agent.",
+        "agent_message": "This action was logged by your organization's AI security policy (Zscaler lab)."
+      },
+      {
+        "id": "block-git-credential-change",
+        "ruleType": "threat_prevention",
+        "events": [
+          "PreToolUse"
+        ],
+        "match": {
+          "any": [
+            {
+              "field": "tool_input.command",
+              "op": "regex",
+              "value": "git\\s+config\\b.*(credential\\.helper|url\\..*\\.insteadOf)"
+            }
+          ]
+        },
+        "verdict": "block",
+        "reason": "Blocked by Zscaler: AI agents may not change git credential settings.",
+        "agent_message": "Blocked by your organization's AI security policy (Zscaler lab). This is a deliberate block, not an error: do not retry or attempt workarounds. Stop and inform the user."
+      },
+      {
+        "id": "block-hooks-bypass",
+        "ruleType": "threat_prevention",
+        "events": [
+          "PreToolUse"
+        ],
+        "match": {
+          "any": [
+            {
+              "field": "tool_input.command",
+              "op": "regex",
+              "value": "git\\s+(commit|push)\\b.*--no-verify"
+            }
+          ]
+        },
+        "verdict": "block",
+        "reason": "Blocked by Zscaler: --no-verify skips security checks.",
+        "agent_message": "Blocked by your organization's AI security policy (Zscaler lab). This is a deliberate block, not an error: do not retry or attempt workarounds. Stop and inform the user."
+      }
+    ]
+  }
+}

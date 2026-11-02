@@ -1,0 +1,47 @@
+{
+  "Policies": {
+    "items": [
+      {
+        "id": "pol-baseline",
+        "name": "Lab 01 - Secrets & credential protection",
+        "rules": 6,
+        "assigned": "All users"
+      },
+      {
+        "id": "pol-dev",
+        "name": "Lab 04 - Software supply chain & repo hygiene",
+        "rules": 2,
+        "assigned": "group: developers"
+      }
+    ]
+  },
+  "Setting profiles": {
+    "items": [
+      {
+        "id": "default",
+        "name": "Default",
+        "agent_mode": "enforce"
+      }
+    ]
+  },
+  "Effective policy": {
+    "email": "alice@demo.lab",
+    "policies": [
+      "Lab 01 - Secrets & credential protection"
+    ],
+    "rules": [
+      {
+        "id": "block-secrets-read",
+        "verdict": "block"
+      },
+      {
+        "id": "block-curl-pipe-sh",
+        "verdict": "block"
+      },
+      {
+        "id": "audit-force-push",
+        "verdict": "audit"
+      }
+    ]
+  }
+}
