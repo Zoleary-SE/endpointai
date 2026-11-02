@@ -4,3 +4,9 @@ __pycache__/
 .pytest_cache/
 .venv/
 *.zip
+
+# local tool output
+.DS_Store
+graphify-out/
+.enola/
+snapshot/
